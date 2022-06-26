@@ -70,35 +70,33 @@ function buildCharts(sample) {
     var result = resultArray[0];
 
     // 6. Create variables that hold the otu_ids, otu_labels, and sample_values.
-    var otu_ids = result.otu_ids
-    var otu_labels = result.otu_labels.slice(0, 10).reverse();
-    var sample_values = result.sample_values.slice(0, 10).reverse();
-    console.log(otu_ids)
-    console.log(otu_labels)
-    console.log(sample_values)
+    var otuIds = result.otu_ids
+    var otuLabels = result.otu_labels.slice(0, 10).reverse();
+    var sampleValues = result.sample_values.slice(0, 10).reverse();
+
 
     // 7. Create the yticks for the bar chart.
     // Hint: Get the the top 10 otu_ids and map them in descending order  
     //  so the otu_ids with the most bacteria are last. 
 
-    var yticks = otu_ids.map(sampleObj => "OTU " + sampleObj).slice(0,10).reverse();
+    var yticks = otuIds.map(sampleObj => "OTU " + sampleObj).slice(0,10).reverse();
     console.log(yticks)
 
     // 8. Create the trace for the bar chart. 
 
-    var traceBar = [{
-      x: sample_values,
+    var dataBar = [{
+      x: sampleValues,
       y: yticks,
       type: "bar",
       orientation: "h",
-      text: otu_labels
+      text: otuLabels
     }];
 
-    var dataBar = [traceBar];
+
     // 9. Create the layout for the bar chart. 
     var barLayout = {
       title: "Top 10 Bacteria Cultures Found",
-      titlefont: {"size": 25},
+      titlefont: {"size": 20},
       xaxis: {title: "Sample Value"}
     };
 
@@ -108,15 +106,16 @@ function buildCharts(sample) {
     //--------------//
     // Creating Bubble//
     //--------------//
-
+    var bubbleLabels = result.otu_labels;
+    var bubbleValues = result.sample_values;
 
     var bubbleData = [{
       x: otuIds,
       y: sampleValues,
-      text: otuLables,
+      text: bubbleLabels,
       mode: "markers",
       marker: {
-        size: sampleValues,
+        size: bubbleValues,
         color: otuIds,
         colorscale: 'RdBu',
       }
@@ -127,7 +126,7 @@ function buildCharts(sample) {
       title: "Bacteria Cultures per Sample",
       xaxis: {title: "OTU ID"},
       yaxis: {title: "Sample Value"},
-      titlefont: {"size": 25},
+      titlefont: {"size": 20},
       hovermode: "closest",
       height: 500
     };
@@ -137,26 +136,31 @@ function buildCharts(sample) {
     //--------------//
     // GAUGE DATA//
     //--------------//
+
+    var metadata = data.metadata;
+    var gaugeArray = metadata.filter(metaObj => metaObj.id == sample);
+    var gaugeResult = gaugeArray[0];
+
     // 3. Create a variable that holds the washing frequency.
-    var wfreq = parseFloat(result.wfreq)
+    var wfreq = gaugeResult.wfreq;
     console.log(wfreq)
     // 4. Create the trace for the gauge chart.
     var gaugeData = [{
-      domain: { x: [0, 1], y: [0, 1] },
       value: wfreq,
       type: "indicator",
       mode: "gauge+number",
       title: { text: "Belly Button Washing Frequency <br>Scrubs per Week " },
+      bar: {color: "red"},
       gauge: {
-        axis: {range:[null,10],tickwidth:2},
+        axis: {range:[null,10],tickwidth: 2, tickcolor: "gray"},
         steps: [
-          { range: [0, 2], color: "gainsboro" },
-          { range: [2, 4], color: "lightskyblue" },
-          { range: [4, 6], color: "slategrey" },
-          { range: [6, 8], color: "cornflowerblue" },
-          { range: [8, 10], color: "royalblue" },
-        ]
-    
+          { range: [0, 2], color: "red" },
+          { range: [2, 4], color: "orange" },
+          { range: [4, 6], color: "yellow" },
+          { range: [6, 8], color: "lightgreen" },
+          { range: [8, 10], color: "green" },
+        ],
+        dtick: 2
       }
     }];
     
@@ -164,7 +168,7 @@ function buildCharts(sample) {
     var gaugeLayout = { 
       width: 450, 
       height: 445,
-      margin: { t: 0, b: 0 }
+      automargin: true
     }; 
 
     // 6. Use Plotly to plot the gauge data and layout.
